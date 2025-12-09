@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏫 全能数学思维训练机 (无限版)</title>
+    <style>
+        :root {
+            --primary: #FFB347; /* 活力橙 */
+            --secondary: #87CEEB; /* 天空蓝 */
+            --accent: #FF6961; /* 珊瑚红 */
+            --success: #77DD77; /* 糖果绿 */
+            --text: #444;
+            --bg: #F0F4F8;
+            --card-bg: #fff;
+        }
+
+        body {
+            font-family: "Comic Sans MS", "Microsoft YaHei", "PingFang SC", sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(#dbe2e8 1px, transparent 1px);
+            background-size: 20px 20px;
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none; /* 防止双击放大 */
+        }
+
+        /* --- 头部 --- */
+        header {
+            width: 100%;
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        h1 { margin: 0; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); font-size: 1.5rem; }
+
+        .container {
+            width: 95%;
+            max-width: 600px;
+            margin: 20px auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+        /* --- 卡片通用 --- */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 2px solid white;
+            animation: popIn 0.4s ease-out;
+            position: relative;
+        }
+        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* --- 年级选择器 --- */
+        .grade-tabs {
+            display: flex;
+            background: #fff;
+            padding: 5px;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .grade-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #888;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .grade-tab.active {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(135, 206, 235, 0.4);
+        }
+
+        /* --- 题目类型按钮 --- */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .mode-btn {
+            border: none;
+            padding: 15px 10px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .mode-btn:active { transform: scale(0.95); }
+        .mode-btn span.desc { font-size: 0.75rem; font-weight: normal; opacity: 0.9; }
+
+        .btn-blue { background: #54a0ff; box-shadow: 0 4px 0 #2e86de; }
+        .btn-green { background: #1dd1a1; box-shadow: 0 4px 0 #10ac84; }
+        .btn-orange { background: #ff9f43; box-shadow: 0 4px 0 #e58e26; }
+        .btn-purple { background: #5f27cd; box-shadow: 0 4px 0 #341f97; }
+
+        /* --- 游戏区域 --- */
+        #gameArea { display: none; width: 100%; text-align: center; }
+        
+        .status-header {
+            display: flex; justify-content: space-between; font-weight: bold; color: #888; margin-bottom: 15px; font-size: 0.9rem;
+        }
+
+        .question-wrapper {
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #fafafa;
+            border-radius: 15px;
+            padding: 10px;
+        }
+
+        .question-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            font-family: "Courier New", monospace;
+            line-height: 1.2;
+        }
+        
+        /* 应用题专用样式 */
+        .word-problem {
+            font-size: 1.3rem;
+            font-family: "Microsoft YaHei", sans-serif;
+            text-align: left;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        /* 凑十法提示 */
+        .method-hint {
+            font-size: 0.95rem;
+            color: #e67e22;
+            margin-top: 10px;
+            background: #fff3e0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px dashed #e67e22;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .input-box {
+            width: 140px; height: 50px;
+            font-size: 1.8rem; text-align: center;
+            border: 3px solid var(--secondary);
+            border-radius: 10px; outline: none;
+            background: #F0F8FF; color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* 键盘 */
+        .numpad {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+            max-width: 340px; margin: 0 auto;
+        }
+        .key {
+            background: white; border: 1px solid #ddd;
+            border-radius: 10px; padding: 12px;
+            font-size: 1.3rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 3px 0 #eee; color: #555;
+            transition: background 0.1s;
+        }
+        .key:active { transform: translateY(2px); box-shadow: none; background: #f0f0f0; }
+        .key.submit { background: var(--success); color: white; border-color: #5cbd5c; box-shadow: 0 3px 0 #4cae4c; }
+        .key.back { background: var(--accent); color: white; border-color: #ff4d4d; box-shadow: 0 3px 0 #e60000; }
+
+        /* --- 动画与特效 --- */
+        .shake { animation: shake 0.4s; border-color: var(--accent); color: var(--accent); }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+        
+        #feedback { height: 25px; margin-bottom: 5px; font-weight: bold; color: var(--success); font-size: 1.1rem; }
+
+        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; overflow: hidden; display: none; }
+        .confetti { position: absolute; width: 10px; height: 10px; background: #f00; animation: fall linear forwards; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: absolute; top: 15px; left: 15px;
+            background: rgba(255,255,255,0.3); border: 2px solid white;
+            color: white; padding: 5px 12px; border-radius: 20px;
+            cursor: pointer; font-size: 0.9rem; font-weight: bold;
+        }
+        
+        .mistake-btn { width: 100%; background: #fff; color: var(--accent); border: 2px solid var(--accent); margin-top: 15px; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        
+        /* 错题列表 */
+        .mistake-list { text-align: left; max-height: 400px; overflow-y: auto; padding: 0; list-style: none; }
+        .mistake-item { background: #fff5f5; padding: 12px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--accent); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .mistake-content { font-size: 0.95rem; line-height: 1.5; width: 75%; }
+        .del-mistake { background: var(--secondary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="back-btn" id="homeBtn" style="display:none" onclick="goHome()">🏠 退出</div>
+    <h1>🏫 全能数学思维训练</h1>
+</header>
+
+<div class="container">
+
+    <!-- 1. 年级与模式选择 -->
+    <div id="menuArea">
+        <div class="grade-tabs">
+            <div class="grade-tab active" onclick="switchGrade(1)">一年级</div>
+            <div class="grade-tab" onclick="switchGrade(2)">二年级</div>
+            <div class="grade-tab" onclick="switchGrade(3)">三年级</div>
+        </div>
+
+        <div class="card">
+            <h3 id="gradeTitle" style="text-align:center; color:#555; margin-bottom:20px;">一年级 - 题库选择</h3>
+            <div class="mode-grid" id="modeContainer">
+                <!-- JS 动态生成按钮 -->
+            </div>
+            <button class="mistake-btn" onclick="showMistakes()">📕 查看我的错题本</button>
+        </div>
+    </div>
+
+    <!-- 2. 答题区域 -->
+    <div id="gameArea" class="card">
+        <div class="status-header">
+            <span id="gameModeTitle">模式</span>
+            <span id="scoreDisplay">✨ 得分: 0</span>
+        </div>
+
+        <div class="question-wrapper">
+            <div id="questionText" class="question-text">10 + 5 = ?</div>
+            <div id="methodHint" class="method-hint" style="display:none;"></div>
+        </div>
+
+        <div id="feedback"></div>
+        
+        <input type="text" id="answerInput" class="input-box" readonly placeholder="?">
+
+        <div class="numpad">
+            <button class="key" onclick="inputNum(1)">1</button>
+            <button class="key" onclick="inputNum(2)">2</button>
+            <button class="key" onclick="inputNum(3)">3</button>
+            <button class="key" onclick="inputNum(4)">4</button>
+            <button class="key" onclick="inputNum(5)">5</button>
+            <button class="key" onclick="inputNum(6)">6</button>
+            <button class="key" onclick="inputNum(7)">7</button>
+            <button class="key" onclick="inputNum(8)">8</button>
+            <button class="key" onclick="inputNum(9)">9</button>
+            <button class="key back" onclick="inputNum('del')">🔙</button>
+            <button class="key" onclick="inputNum(0)">0</button>
+            <button class="key submit" onclick="submitAnswer()">确定</button>
+        </div>
+    </div>
+
+    <!-- 3. 错题本 -->
+    <div id="mistakeArea" class="card" style="display:none;">
+        <h3 style="color:var(--accent); text-align:center; margin-top:0;">📕 错题积累</h3>
+        <p style="text-align:center; color:#999; font-size:0.8rem;">温故而知新，点击右侧按钮移除</p>
+        <ul class="mistake-list" id="mistakeList"></ul>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="mode-btn btn-blue" style="flex:1" onclick="goHome()">返回</button>
+            <button class="mode-btn btn-orange" style="flex:1; background:#999; box-shadow:0 4px 0 #777;" onclick="clearAllMistakes()">清空</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- 撒花特效容器 -->
+<div id="confetti" class="confetti-container"></div>
+
+<script>
+    // --- 🎒 词汇工厂 (应用题生成原料) ---
+    const VOCAB = {
+        names: ['小明', '小红', '小刚', '丽丽', '妈妈', '王老师', '爷爷', '奶奶', '爸爸'],
+        // 物品与对应的量词 [物品名, 量词]
+        items_food: [['苹果', '个'], ['橘子', '个'], ['糖果', '颗'], ['饼干', '包'], ['鸡蛋', '个'], ['面包', '个']],
+        items_stationery: [['铅笔', '支'], ['橡皮', '块'], ['故事书', '本'], ['作业本', '本'], ['尺子', '把']],
+        items_animal: [['小鸟', '只'], ['蝴蝶', '只'], ['小兔子', '只'], ['小鸭子', '只'], ['小松鼠', '只']],
+        items_toy: [['气球', '个'], ['皮球', '个'], ['积木', '块'], ['玩具车', '辆'], ['布娃娃', '个']],
+        
+        // 动作库
+        acts_add: ['买来了', '又摘了', '捡到了', '收到了', '做好了', '又拿来'],
+        acts_sub: ['吃掉了', '送人了', '弄丢了', '用坏了', '飞走了', '卖掉了'],
+        places: ['超市', '文具店', '果园', '书店', '学校', '游乐园']
+    };
+
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+    // --- 题库配置 ---
+    const GAME_CONFIG = {
+        1: [ // 一年级
+            { id: 'basic_20', name: '20以内加减', color: 'btn-blue', desc: '基础计算' },
+            { id: 'method_10', name: '凑十法/破十法', color: 'btn-orange', desc: '进位退位专项' },
+            { id: 'word_easy', name: '简单应用题', color: 'btn-green', desc: '智能生成不重样' }
+        ],
+        2: [ // 二年级
+            { id: 'basic_100', name: '100以内加减', color: 'btn-blue', desc: '进位退位' },
+            { id: 'mul_table', name: '乘法口诀', color: 'btn-orange', desc: '九九乘法表' },
+            { id: 'word_mid', name: '混合应用题', color: 'btn-green', desc: '加减乘混合' }
+        ],
+        3: [ // 三年级
+            { id: 'calc_hard', name: '多位数乘除', color: 'btn-blue', desc: '竖式计算基础' },
+            { id: 'unit_calc', name: '巧算速算', color: 'btn-purple', desc: '找规律' },
+            { id: 'word_hard', name: '复杂应用题', color: 'btn-green', desc: '两步计算逻辑' }
+        ]
+    };
+
+    // --- 全局变量 ---
+    let currentGrade = 1;
+    let currentMode = '';
+    let currentQuestion = {};
+    let score = 0;
+    let mistakeBook = JSON.parse(localStorage.getItem('mathMistakes_final')) || [];
+
+    // --- 初始化 ---
+    window.onload = () => switchGrade(1);
+
+    function switchGrade(grade) {
+        currentGrade = grade;
+        document.querySelectorAll('.grade-tab').forEach((t, i) => {
+            t.classList.toggle('active', i + 1 === grade);
+        });
+        document.getElementById('gradeTitle').innerText = `${['一','二','三'][grade-1]}年级 - 题库选择`;
+        renderModes();
+    }
+
+    function renderModes() {
+        const container = document.getElementById('modeContainer');
+        container.innerHTML = GAME_CONFIG[currentGrade].map(mode => `
+            <button class="mode-btn ${mode.color}" onclick="startGame('${mode.id}', '${mode.name}')">
+                <span>${mode.name}</span>
+                <span class="desc">${mode.desc}</span>
+            </button>
+        `).join('');
+    }
+
+    // --- 🏭 智能应用题生成引擎 (核心逻辑) ---
+    function generateWordProblem(grade) {
+        let text = "", n1, n2, ans, op;
+        const name = pick(VOCAB.names);
+        
+        // --- 一年级：基础加减 (物品/动物) ---
+        if (grade === 1) {
+            op = Math.random() > 0.5 ? '+' : '-';
+            
+            // 场景A：动物/加减
+            if (Math.random() > 0.5) {
+                const [animal, unit] = pick(VOCAB.items_animal);
+                n1 = rand(5, 15);
+                n2 = rand(2, 9);
+                
+                if (op === '+') {
+                    const verb = (animal === '小鸟' || animal === '蝴蝶') ? '飞来了' : '跑来了';
+                    text = `草地上原来有 ${n1} ${unit}${animal}，又${verb} ${n2} ${unit}，现在一共有几${unit}？`;
+                    ans = n1 + n2;
+                } else {
+                    const verb = (animal === '小鸟' || animal === '蝴蝶') ? '飞走了' : '跑走了';
+                    text = `草地上有 ${n1} ${unit}${animal}，${verb} ${n2} ${unit}，还剩几${unit}？`;
+                    ans = n1 - n2;
+                }
+            } 
+            // 场景B：物品/持有
+            else {
+                const [item, unit] = pick(VOCAB.items_food.concat(VOCAB.items_stationery));
+                n1 = rand(5, 18);
+                n2 = rand(1, n1 - 1); 
+                
+                if (op === '+') {
+                    text = `${name}有 ${n1} ${unit}${item}，妈妈又给了他 ${n2} ${unit}，现在他有几${unit}？`;
+                    ans = n1 + n2;
+                } else {
+                    const act = pick(VOCAB.acts_sub);
+                    text = `${name}有 ${n1} ${unit}${item}，${act} ${n2} ${unit}，还剩几${unit}？`;
+                    ans = n1 - n2;
+                }
+            }
+        }
+
+        // --- 二年级：乘法/金钱/倍数 ---
+        else if (grade === 2) {
+            const type = Math.random();
+            // 场景A：购物 (乘法)
+            if (type < 0.4) {
+                const [item, unit] = pick(VOCAB.items_food.concat(VOCAB.items_toy));
+                n1 = rand(2, 9); // 单价
+                n2 = rand(2, 9); // 数量
+                op = '*';
+                text = `商店里一种${item}卖 ${n1} 元，${name}想买 ${n2} ${unit}，一共需要多少钱？`;
+                ans = n1 * n2;
+            }
+            // 场景B：倍数关系 (加减)
+            else if (type < 0.7) {
+                const [item, unit] = pick(VOCAB.items_toy);
+                n2 = rand(10, 30); 
+                n1 = rand(5, 20);  
+                op = '+';
+                text = `${name}收集了 ${n2} ${unit}${item}，小刚收集的比他多 ${n1} ${unit}，小刚有几${unit}？`;
+                ans = n2 + n1;
+            }
+            // 场景C：平均分 (除法)
+            else {
+                const [item, unit] = pick(VOCAB.items_food);
+                n2 = rand(2, 8); // 人数
+                ans = rand(3, 9); // 每人分得
+                n1 = n2 * ans;    // 总数
+                op = '/';
+                text = `盘子里有 ${n1} ${unit}${item}，平均分给 ${n2} 个小朋友，每人能分到几${unit}？`;
+            }
+        }
+
+        // --- 三年级：两步计算/大数/逻辑 ---
+        else {
+            const type = Math.random();
+            // 场景A：读书 (剩余页数)
+            if (type < 0.3) {
+                const total = rand(80, 200);
+                const read = rand(20, 60);
+                op = '-';
+                text = `一本故事书一共有 ${total} 页，${name}第一天看了 ${read} 页，还剩多少页没看？`;
+                ans = total - read;
+            }
+            // 场景B：大数购物 (加法)
+            else if (type < 0.6) {
+                n1 = rand(50, 200); // 衣服
+                n2 = rand(30, 100); // 裤子
+                op = '+';
+                text = `妈妈买上衣花了 ${n1} 元，买裤子花了 ${n2} 元，妈妈一共花了多少钱？`;
+                ans = n1 + n2;
+            }
+            // 场景C：装箱 (除法)
+            else {
+                const [item, unit] = pick(VOCAB.items_food);
+                n2 = rand(4, 8);  // 每箱数量
+                ans = rand(10, 30); // 箱数
+                n1 = n2 * ans;
+                op = '/';
+                text = `果园里摘了 ${n1} ${unit}${item}，每 ${n2} ${unit}装一箱，可以装多少箱？`;
+            }
+        }
+
+        return { text, ans, isWord: true };
+    }
+
+
+    // --- 游戏逻辑 ---
+    function startGame(modeId, modeName) {
+        currentMode = modeId;
+        score = 0;
+        document.getElementById('scoreDisplay').innerText = `✨ 得分: 0`;
+        document.getElementById('gameModeTitle').innerText = modeName;
+        document.getElementById('menuArea').style.display = 'none';
+        document.getElementById('gameArea').style.display = 'block';
+        document.getElementById('homeBtn').style.display = 'block';
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        document.getElementById('answerInput').value = '';
+        document.getElementById('feedback').innerText = '';
+        document.getElementById('methodHint').style.display = 'none';
+        
+        let q = {};
+        
+        // 1. 应用题 (调用无限生成引擎)
+        if (currentMode.startsWith('word_')) {
+            q = generateWordProblem(currentGrade);
+        } 
+        // 2. 凑十法/破十法 (专项)
+        else if (currentMode === 'method_10') {
+            if (Math.random() > 0.5) {
+                // 凑十: 8 + 5 = ?
+                let n1 = rand(6, 9); 
+                let n2 = rand(11-n1, 9); // 确保进位
+                q.ans = n1 + n2;
+                q.text = `${n1} + ${n2} = ?`;
+                let need = 10 - n1;
+                let rest = n2 - need;
+                q.hint = `💡 提示：把 ${n2} 分成 ${need} 和 ${rest}，先算 ${n1}+${need}=10，再算 10+${rest}`;
+            } else {
+                // 破十: 15 - 8 = ?
+                let n1 = rand(11, 18);
+                let n2 = rand(n1-9, 9); // 确保退位
+                q.ans = n1 - n2;
+                q.text = `${n1} - ${n2} = ?`;
+                let rest = n1 - 10;
+                q.hint = `💡 提示：先算 10 - ${n2} = ${10-n2}，再算 ${10-n2} + ${rest}`;
+            }
+        }
+        // 3. 普通计算 (根据年级)
+        else {
+            if (currentGrade === 1) { // 20以内
+                let op = Math.random() > 0.5 ? '+' : '-';
+                if (op === '+') {
+                    let n1 = rand(1, 15); let n2 = rand(1, 20-n1);
+                    q.text = `${n1} + ${n2} = ?`; q.ans = n1+n2;
+                } else {
+                    let n1 = rand(5, 20); let n2 = rand(1, n1);
+                    q.text = `${n1} - ${n2} = ?`; q.ans = n1-n2;
+                }
+            } else if (currentGrade === 2) { // 100以内 & 乘法
+                if (currentMode === 'mul_table') {
+                    let n1 = rand(2, 9); let n2 = rand(2, 9);
+                    q.text = `${n1} × ${n2} = ?`; q.ans = n1*n2;
+                } else {
+                    let op = Math.random() > 0.5 ? '+' : '-';
+                    let n1 = rand(10, 90); let n2 = rand(5, 50);
+                    if(op==='+') { q.text=`${n1} + ${n2} = ?`; q.ans=n1+n2; }
+                    else { if(n1<n2)[n1,n2]=[n2,n1]; q.text=`${n1} - ${n2} = ?`; q.ans=n1-n2; }
+                }
+            } else { // 三年级
+                let op = ['+','-','×','÷'][Math.floor(Math.random()*4)];
+                if(op==='×') {
+                    let n1 = rand(11, 30); let n2 = rand(2, 6);
+                    q.text = `${n1} × ${n2} = ?`; q.ans = n1*n2;
+                } else if (op==='÷') {
+                    let ans = rand(5, 20); let n2 = rand(2, 8);
+                    let n1 = ans*n2;
+                    q.text = `${n1} ÷ ${n2} = ?`; q.ans = ans;
+                } else {
+                    let n1 = rand(100, 500); let n2 = rand(50, 300);
+                    if(op==='-'){ if(n1<n2)[n1,n2]=[n2,n1]; q.ans=n1-n2; q.text=`${n1} - ${n2} = ?`;}
+                    else { q.ans=n1+n2; q.text=`${n1} + ${n2} = ?`; }
+                }
+            }
+        }
+
+        currentQuestion = q;
+        renderQuestion(q);
+    }
+
+    function renderQuestion(q) {
+        const textBox = document.getElementById('questionText');
+        const hintBox = document.getElementById('methodHint');
+        
+        textBox.innerText = q.text;
+        
+        if (q.isWord) {
+            textBox.className = 'question-text word-problem';
+        } else {
+            textBox.className = 'question-text';
+        }
+
+        if (q.hint) {
+            hintBox.innerText = q.hint;
+            hintBox.style.display = 'inline-block';
+        }
+    }
+
+    // --- 交互与结算 ---
+    function inputNum(val) {
+        const input = document.getElementById('answerInput');
+        if (val === 'del') input.value = input.value.slice(0, -1);
+        else if (input.value.length < 5) input.value += val;
+    }
+
+    function submitAnswer() {
+        const input = document.getElementById('answerInput');
+        const val = parseInt(input.value);
+        if (isNaN(val)) return;
+
+        if (val === currentQuestion.ans) {
+            score += 10;
+            document.getElementById('scoreDisplay').innerText = `✨ 得分: ${score}`;
+            document.getElementById('feedback').innerText = "🎉 答对了！";
+            showConfetti();
+            setTimeout(nextQuestion, 1000);
+        } else {
+            document.getElementById('feedback').innerText = "😅 加油再算算";
+            input.classList.add('shake');
+            saveMistake(currentQuestion, val);
+            setTimeout(() => input.classList.remove('shake'), 400);
+        }
+    }
+
+    // --- 撒花特效 ---
+    function showConfetti() {
+        const container = document.getElementById('confetti');
+        container.style.display = 'block';
+        container.innerHTML = '';
+        const colors = ['#f00', '#0f0', '#00f', '#ff0', '#0ff', '#f0f'];
+        for (let i = 0; i < 40; i++) {
+            const div = document.createElement('div');
+            div.className = 'confetti';
+            div.style.left = Math.random() * 100 + 'vw';
+            div.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            div.style.animationDuration = (Math.random() * 1 + 0.5) + 's';
+            container.appendChild(div);
+        }
+        setTimeout(() => container.style.display = 'none', 1500);
+    }
+
+    // --- 错题本 ---
+    function saveMistake(q, wrongAns) {
+        const item = {
+            title: q.text,
+            wrong: wrongAns,
+            right: q.ans,
+            tag: currentGrade + "年级"
+        };
+        // 查重：避免同一题重复存
+        if (!mistakeBook.some(m => m.title === item.title)) {
+            mistakeBook.unshift(item);
+            localStorage.setItem('mathMistakes_final', JSON.stringify(mistakeBook));
+        }
+    }
+
+    function showMistakes() {
+        document.getElementById('menuArea').style.display = 'none';
+        document.getElementById('mistakeArea').style.display = 'block';
+        document.getElementById('homeBtn').style.display = 'none'; // 错题本自己有返回键
+        
+        const list = document.getElementById('mistakeList');
+        if(mistakeBook.length === 0) {
+            list.innerHTML = "<p style='text-align:center;color:#999;margin-top:50px;'>🏆 真棒，还没有错题哦！</p>";
+        } else {
+            list.innerHTML = mistakeBook.map((m, i) => `
+                <li class="mistake-item">
+                    <div class="mistake-content">
+                        <div style="font-weight:bold; color:#333; margin-bottom:5px;">${m.title}</div>
+                        <div style="font-size:0.85rem; color:#666">
+                            我的答案: <span style="text-decoration:line-through;color:#FF6961">${m.wrong}</span> 
+                            正确: <span style="color:#77DD77;font-weight:bold">${m.right}</span>
+                            <span style="font-size:0.7rem; background:#eee; padding:2px 5px; border-radius:4px; margin-left:5px;">${m.tag}</span>
+                        </div>
+                    </div>
+                    <button class="del-mistake" onclick="removeMistake(${i})">学会了</button>
+                </li>
+            `).join('');
+        }
+    }
+
+    function removeMistake(index) {
+        mistakeBook.splice(index, 1);
+        localStorage.setItem('mathMistakes_final', JSON.stringify(mistakeBook));
+        showMistakes(); 
+    }
+
+    function clearAllMistakes() {
+        if(confirm("确定要清空所有错题记录吗？")) {
+            mistakeBook = [];
+            localStorage.setItem('mathMistakes_final', JSON.stringify(mistakeBook));
+            showMistakes();
+        }
+    }
+
+    function goHome() {
+        document.getElementById('gameArea').style.display = 'none';
+        document.getElementById('mistakeArea').style.display = 'none';
+        document.getElementById('menuArea').style.display = 'block';
+        document.getElementById('homeBtn').style.display = 'none';
+    }
+
+</script>
+</body>
+</html>
