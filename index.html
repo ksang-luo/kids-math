@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🏫 全能数学思维训练机 (语音版)</title>
+    <title>🏫 全能数学思维训练机 (统计版)</title>
     <style>
         :root {
-            --primary: #FFB347;
-            --secondary: #87CEEB;
-            --accent: #FF6961;
-            --success: #77DD77;
+            --primary: #FFB347; /* 活力橙 */
+            --secondary: #87CEEB; /* 天空蓝 */
+            --accent: #FF6961; /* 珊瑚红 */
+            --success: #77DD77; /* 糖果绿 */
             --text: #444;
             --bg: #F0F4F8;
             --card-bg: #fff;
@@ -141,7 +141,7 @@
             background: #fafafa;
             border-radius: 15px;
             padding: 10px;
-            position: relative; /* 为朗读按钮定位 */
+            position: relative;
         }
 
         .question-text {
@@ -152,7 +152,6 @@
             line-height: 1.2;
         }
         
-        /* 应用题专用样式 */
         .word-problem {
             font-size: 1.3rem;
             font-family: "Microsoft YaHei", sans-serif;
@@ -161,31 +160,31 @@
             color: #2c3e50;
         }
 
-        /* 朗读重播按钮 */
         .replay-voice-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #eee;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 1.2rem;
-            line-height: 30px;
-            cursor: pointer;
-            display: none; /* 默认隐藏，应用题显示 */
+            position: absolute; top: 5px; right: 5px;
+            background: #eee; border-radius: 50%;
+            width: 30px; height: 30px;
+            font-size: 1.2rem; line-height: 30px;
+            cursor: pointer; display: none; 
         }
 
+        /* 凑十法提示 (可点击) */
         .method-hint {
-            font-size: 0.95rem;
-            color: #e67e22;
-            margin-top: 10px;
-            background: #fff3e0;
-            padding: 8px 15px;
-            border-radius: 20px;
+            font-size: 0.95rem; color: #e67e22;
+            margin-top: 10px; background: #fff3e0;
+            padding: 8px 15px; border-radius: 20px;
             border: 1px dashed #e67e22;
             animation: fadeIn 0.5s;
+            cursor: pointer; /* 变成手型 */
+            transition: all 0.2s;
         }
+        .method-hint:active {
+            transform: scale(0.95);
+            background: #ffe0b2;
+        }
+        /* 提示旁边的小喇叭图标 */
+        .hint-icon { margin-right: 5px; font-size: 1rem; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         .input-box {
@@ -221,7 +220,7 @@
         .confetti { position: absolute; width: 10px; height: 10px; background: #f00; animation: fall linear forwards; }
         @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
 
-        /* 顶部按钮组 */
+        /* 顶部按钮 */
         .header-btn {
             position: absolute; top: 15px; 
             background: rgba(255,255,255,0.3); border: 2px solid white;
@@ -231,12 +230,54 @@
         .back-btn { left: 15px; }
         .mute-btn { right: 15px; min-width: 30px;}
         
-        .mistake-btn { width: 100%; background: #fff; color: var(--accent); border: 2px solid var(--accent); margin-top: 15px; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        /* 菜单按钮通用 */
+        .menu-action-btn { 
+            width: 100%; margin-top: 10px; padding: 12px; 
+            border-radius: 10px; font-weight: bold; cursor: pointer; 
+            font-size: 1rem;
+        }
+        .btn-mistake { background: #fff; color: var(--accent); border: 2px solid var(--accent); }
+        .btn-stats { background: #fff; color: var(--secondary); border: 2px solid var(--secondary); }
         
-        .mistake-list { text-align: left; max-height: 400px; overflow-y: auto; padding: 0; list-style: none; }
+        /* 列表容器 */
+        .scroll-list { text-align: left; max-height: 400px; overflow-y: auto; padding: 0; list-style: none; }
+        
+        /* 错题项 */
         .mistake-item { background: #fff5f5; padding: 12px; margin-bottom: 10px; border-radius: 8px; border-left: 5px solid var(--accent); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .mistake-content { font-size: 0.95rem; line-height: 1.5; width: 75%; }
         .del-mistake { background: var(--secondary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+
+        /* --- 统计面板样式 --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #fcfcfc;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            padding: 15px 10px;
+            text-align: center;
+        }
+        .stat-val { font-size: 1.6rem; font-weight: bold; color: var(--primary); display: block; }
+        .stat-label { font-size: 0.85rem; color: #888; }
+        
+        /* 每日记录项 */
+        .history-item {
+            background: #f0f8ff;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 5px solid var(--secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-date { font-weight: bold; color: #555; }
+        .history-detail { font-size: 0.85rem; color: #777; }
+        
     </style>
 </head>
 <body>
@@ -262,7 +303,9 @@
             <div class="mode-grid" id="modeContainer">
                 <!-- JS 动态生成按钮 -->
             </div>
-            <button class="mistake-btn" onclick="showMistakes()">📕 查看我的错题本</button>
+            
+            <button class="menu-action-btn btn-stats" onclick="showStats()">📊 学习档案 (本周记录)</button>
+            <button class="menu-action-btn btn-mistake" onclick="showMistakes()">📕 查看我的错题本</button>
         </div>
     </div>
 
@@ -276,7 +319,8 @@
         <div class="question-wrapper">
             <div class="replay-voice-btn" id="replayVoiceBtn" onclick="readCurrentQuestion()">🔊</div>
             <div id="questionText" class="question-text">10 + 5 = ?</div>
-            <div id="methodHint" class="method-hint" style="display:none;"></div>
+            <!-- 提示区域：点击可朗读 -->
+            <div id="methodHint" class="method-hint" style="display:none;" onclick="readHint()"></div>
         </div>
 
         <div id="feedback"></div>
@@ -303,11 +347,42 @@
     <div id="mistakeArea" class="card" style="display:none;">
         <h3 style="color:var(--accent); text-align:center; margin-top:0;">📕 错题积累</h3>
         <p style="text-align:center; color:#999; font-size:0.8rem;">温故而知新，点击右侧按钮移除</p>
-        <ul class="mistake-list" id="mistakeList"></ul>
+        <ul class="scroll-list" id="mistakeList"></ul>
         <div style="display:flex; gap:10px; margin-top:20px;">
             <button class="mode-btn btn-blue" style="flex:1" onclick="goHome()">返回</button>
             <button class="mode-btn btn-orange" style="flex:1; background:#999; box-shadow:0 4px 0 #777;" onclick="clearAllMistakes()">清空</button>
         </div>
+    </div>
+
+    <!-- 4. 统计面板 (新增) -->
+    <div id="statsArea" class="card" style="display:none;">
+        <h3 style="color:var(--secondary); text-align:center; margin-top:0;">📊 学习档案</h3>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-val" id="statWeekTotal">0</span>
+                <span class="stat-label">本周做题</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val" id="statAccuracy">0%</span>
+                <span class="stat-label">总正确率</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val" id="statTotalDays">0</span>
+                <span class="stat-label">打卡天数</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-val" id="statTotalCount">0</span>
+                <span class="stat-label">历史总题数</span>
+            </div>
+        </div>
+
+        <h4 style="margin:10px 0; color:#666; border-bottom:1px solid #eee; padding-bottom:5px;">📅 每日打卡记录</h4>
+        <ul class="scroll-list" id="historyList">
+            <!-- 动态生成 -->
+        </ul>
+        
+        <button class="mode-btn btn-blue" style="width:100%; margin-top:15px;" onclick="goHome()">返回</button>
     </div>
 
 </div>
@@ -316,9 +391,9 @@
 <div id="confetti" class="confetti-container"></div>
 
 <script>
-    // --- 🔊 音频管理器 (新增核心功能) ---
+    // --- 🔊 音频管理器 ---
     const AUDIO = {
-        ctx: null, // AudioContext
+        ctx: null,
         isMuted: false,
         synth: window.speechSynthesis,
 
@@ -332,7 +407,6 @@
             }
         },
 
-        // 播放合成音效 (不需要mp3文件)
         playTone: function(type) {
             if (this.isMuted || !this.ctx) return;
             const osc = this.ctx.createOscillator();
@@ -341,7 +415,6 @@
             gain.connect(this.ctx.destination);
 
             if (type === 'correct') {
-                // 叮咚声 (正弦波，高音)
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(500, this.ctx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(1000, this.ctx.currentTime + 0.1);
@@ -350,7 +423,6 @@
                 osc.start();
                 osc.stop(this.ctx.currentTime + 0.5);
             } else if (type === 'wrong') {
-                // 嗡嗡声 (锯齿波，低音)
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(150, this.ctx.currentTime);
                 osc.frequency.linearRampToValueAtTime(100, this.ctx.currentTime + 0.3);
@@ -361,14 +433,13 @@
             }
         },
 
-        // 文本朗读 (TTS)
         speak: function(text) {
             if (this.isMuted) return;
-            this.synth.cancel(); // 停止上一句
+            this.synth.cancel();
             const utter = new SpeechSynthesisUtterance(text);
             utter.lang = 'zh-CN';
             utter.rate = 1.0; 
-            utter.pitch = 1.1; // 稍微高一点的声音比较亲切
+            utter.pitch = 1.1; 
             this.synth.speak(utter);
         },
 
@@ -381,8 +452,7 @@
         }
     };
 
-
-    // --- 🎒 词汇工厂 (应用题生成原料) ---
+    // --- 🎒 词汇工厂 ---
     const VOCAB = {
         names: ['小明', '小红', '小刚', '丽丽', '妈妈', '王老师', '爷爷', '奶奶', '爸爸'],
         items_food: [['苹果', '个'], ['橘子', '个'], ['糖果', '颗'], ['饼干', '包'], ['鸡蛋', '个'], ['面包', '个']],
@@ -416,17 +486,26 @@
     };
 
     // --- 全局变量 ---
+    let isProcessing = false; // 防抖开关
     let currentGrade = 1;
     let currentMode = '';
     let currentQuestion = {};
     let score = 0;
+    
+    // 💾 数据存储初始化
     let mistakeBook = JSON.parse(localStorage.getItem('mathMistakes_final')) || [];
+    // 统计数据结构
+    let userStats = JSON.parse(localStorage.getItem('mathStats_v1')) || {
+        totalQuestions: 0,
+        totalCorrect: 0,
+        history: {} // 格式: "2023-10-27": { total: 10, correct: 8 }
+    };
 
     // --- 初始化 ---
     window.onload = () => switchGrade(1);
 
     function toggleMute() {
-        AUDIO.init(); // 确保AudioContext已启动
+        AUDIO.init();
         AUDIO.toggle();
     }
 
@@ -449,7 +528,7 @@
         `).join('');
     }
 
-    // --- 🏭 智能应用题生成引擎 ---
+    // --- 题目生成逻辑 ---
     function generateWordProblem(grade) {
         let text = "", n1, n2, ans, op;
         const name = pick(VOCAB.names);
@@ -516,9 +595,8 @@
         return { text, ans, isWord: true };
     }
 
-    // --- 游戏逻辑 ---
     function startGame(modeId, modeName) {
-        AUDIO.init(); // 尝试初始化音频环境
+        AUDIO.init();
         currentMode = modeId;
         score = 0;
         document.getElementById('scoreDisplay').innerText = `✨ 得分: 0`;
@@ -530,6 +608,7 @@
     }
 
     function nextQuestion() {
+        isProcessing = false; // 解锁，允许操作
         document.getElementById('answerInput').value = '';
         document.getElementById('feedback').innerText = '';
         document.getElementById('methodHint').style.display = 'none';
@@ -542,14 +621,18 @@
             if (Math.random() > 0.5) {
                 let n1 = rand(6, 9); let n2 = rand(11-n1, 9);
                 q.ans = n1 + n2; q.text = `${n1} + ${n2} = ?`;
-                q.hint = `💡 提示：把 ${n2} 分成 ${10-n1} 和 ${n2-(10-n1)}，凑成10`;
+                // 只保留纯文本提示，去掉之前的 "💡 提示：" 前缀，方便朗读
+                let need = 10 - n1;
+                let rest = n2 - need;
+                q.hint = `把${n2}分成${need}和${rest}，${n1}加${need}等于10，10加${rest}等于${q.ans}`;
             } else {
                 let n1 = rand(11, 18); let n2 = rand(n1-9, 9);
                 q.ans = n1 - n2; q.text = `${n1} - ${n2} = ?`;
-                q.hint = `💡 提示：先算 10 - ${n2} = ${10-n2}，再加 ${n1-10}`;
+                let rest = n1 - 10;
+                let sub = 10 - n2;
+                q.hint = `先算10减${n2}等于${sub}，再算${sub}加${rest}等于${q.ans}`;
             }
         } else {
-            // 普通计算逻辑保持不变
             if (currentGrade === 1) {
                 let op = Math.random() > 0.5 ? '+' : '-';
                 if (op === '+') {
@@ -599,8 +682,7 @@
         
         if (q.isWord) {
             textBox.className = 'question-text word-problem';
-            voiceBtn.style.display = 'block'; // 显示重播按钮
-            // 延迟一点点读题，体验更自然
+            voiceBtn.style.display = 'block';
             setTimeout(() => readCurrentQuestion(), 300);
         } else {
             textBox.className = 'question-text';
@@ -608,7 +690,8 @@
         }
 
         if (q.hint) {
-            hintBox.innerText = q.hint;
+            // 添加小喇叭图标和文字
+            hintBox.innerHTML = `<span class="hint-icon">🔊</span>💡 提示：${q.hint} (点击朗读)`;
             hintBox.style.display = 'inline-block';
         }
     }
@@ -618,51 +701,129 @@
             AUDIO.speak(currentQuestion.text);
         }
     }
+    
+    // 新增：朗读提示功能
+    function readHint() {
+        if(currentQuestion.hint) {
+            AUDIO.speak(currentQuestion.hint);
+        }
+    }
 
-    // --- 交互与结算 ---
     function inputNum(val) {
-        // 点击按键时，初始化Audio Context（解决iOS浏览器静音策略）
+        if(isProcessing) return; // 🔒 锁定期间禁止输入
         if(AUDIO.ctx && AUDIO.ctx.state === 'suspended') AUDIO.ctx.resume();
-
         const input = document.getElementById('answerInput');
         if (val === 'del') input.value = input.value.slice(0, -1);
         else if (input.value.length < 5) input.value += val;
     }
 
     function submitAnswer() {
+        if(isProcessing) return; // 🔒 锁定期间禁止提交
+
         const input = document.getElementById('answerInput');
         const val = parseInt(input.value);
         if (isNaN(val)) return;
+        
+        // 1. 记录统计数据
+        updateStats(val === currentQuestion.ans);
 
         if (val === currentQuestion.ans) {
-            // --- 答对 ---
+            isProcessing = true; // 🔒 锁定
             score += 10;
             document.getElementById('scoreDisplay').innerText = `✨ 得分: ${score}`;
             document.getElementById('feedback').innerText = "🎉 答对了！";
             
-            // 播放音效
             AUDIO.playTone('correct');
-            // 随机夸奖
-            const praise = ['答对了', '真棒', '好厉害', '正确'];
+            const praise = ['答对了', '真棒', '太厉害了', '正确'];
             setTimeout(() => AUDIO.speak(praise[Math.floor(Math.random()*praise.length)]), 100);
 
             showConfetti();
-            setTimeout(nextQuestion, 1500); // 稍微延长等待时间给语音播放
+            setTimeout(nextQuestion, 1500); // 1.5秒后切题并解锁
         } else {
-            // --- 答错 ---
+            isProcessing = true; // 🔒 锁定
             document.getElementById('feedback').innerText = "😅 加油再算算";
             input.classList.add('shake');
             
-            // 播放音效
             AUDIO.playTone('wrong');
             AUDIO.speak("答错了，再试一次");
 
             saveMistake(currentQuestion, val);
-            setTimeout(() => input.classList.remove('shake'), 400);
+            setTimeout(() => {
+                input.classList.remove('shake');
+                isProcessing = false; // 🔓 0.4秒后解锁允许重试
+            }, 400);
         }
     }
 
-    // --- 撒花特效 ---
+    // --- 📊 统计功能核心逻辑 ---
+    function updateStats(isCorrect) {
+        const today = new Date().toISOString().split('T')[0]; // 获取 YYYY-MM-DD
+        
+        // 全局计数
+        userStats.totalQuestions++;
+        if (isCorrect) userStats.totalCorrect++;
+        
+        // 每日计数
+        if (!userStats.history[today]) {
+            userStats.history[today] = { total: 0, correct: 0 };
+        }
+        userStats.history[today].total++;
+        if (isCorrect) {
+            userStats.history[today].correct++;
+        }
+        
+        // 保存到 localStorage
+        localStorage.setItem('mathStats_v1', JSON.stringify(userStats));
+    }
+
+    function showStats() {
+        document.getElementById('menuArea').style.display = 'none';
+        document.getElementById('statsArea').style.display = 'block';
+        document.getElementById('mistakeArea').style.display = 'none';
+        document.getElementById('homeBtn').style.display = 'none';
+
+        // 1. 计算总正确率
+        let totalRate = userStats.totalQuestions === 0 ? 0 : Math.round((userStats.totalCorrect / userStats.totalQuestions) * 100);
+        document.getElementById('statAccuracy').innerText = totalRate + "%";
+        
+        // 2. 统计打卡天数
+        const dates = Object.keys(userStats.history).sort().reverse();
+        document.getElementById('statTotalDays').innerText = dates.length;
+        document.getElementById('statTotalCount').innerText = userStats.totalQuestions;
+
+        // 3. 计算本周（最近7天）做题数
+        let weekTotal = 0;
+        const now = new Date();
+        const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        
+        dates.forEach(dateStr => {
+            const d = new Date(dateStr);
+            if (d >= oneWeekAgo) {
+                weekTotal += userStats.history[dateStr].total;
+            }
+        });
+        document.getElementById('statWeekTotal').innerText = weekTotal;
+
+        // 4. 生成每日列表 HTML
+        const list = document.getElementById('historyList');
+        if (dates.length === 0) {
+            list.innerHTML = "<p style='text-align:center;color:#999;padding:20px;'>这里空空如也，快去开始第一次练习吧！</p>";
+        } else {
+            list.innerHTML = dates.map(date => {
+                const dayData = userStats.history[date];
+                const dayRate = Math.round((dayData.correct / dayData.total) * 100);
+                return `
+                    <li class="history-item">
+                        <span class="history-date">${date}</span>
+                        <span class="history-detail">
+                            ${dayData.total}题 · 正确率${dayRate}%
+                        </span>
+                    </li>
+                `;
+            }).join('');
+        }
+    }
+
     function showConfetti() {
         const container = document.getElementById('confetti');
         container.style.display = 'block';
@@ -679,7 +840,6 @@
         setTimeout(() => container.style.display = 'none', 1500);
     }
 
-    // --- 错题本 ---
     function saveMistake(q, wrongAns) {
         const item = {
             title: q.text,
@@ -696,6 +856,7 @@
     function showMistakes() {
         document.getElementById('menuArea').style.display = 'none';
         document.getElementById('mistakeArea').style.display = 'block';
+        document.getElementById('statsArea').style.display = 'none';
         document.getElementById('homeBtn').style.display = 'none';
         
         const list = document.getElementById('mistakeList');
@@ -733,10 +894,10 @@
     }
 
     function goHome() {
-        // 停止任何正在播放的声音
         AUDIO.synth.cancel();
         document.getElementById('gameArea').style.display = 'none';
         document.getElementById('mistakeArea').style.display = 'none';
+        document.getElementById('statsArea').style.display = 'none';
         document.getElementById('menuArea').style.display = 'block';
         document.getElementById('homeBtn').style.display = 'none';
     }
