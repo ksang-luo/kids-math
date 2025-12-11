@@ -643,7 +643,7 @@
             // 播放音效
             AUDIO.playTone('correct');
             // 随机夸奖
-            const praise = ['答对了', '真棒', '太聪明了', '正确'];
+            const praise = ['答对了', '真棒', '好厉害', '正确'];
             setTimeout(() => AUDIO.speak(praise[Math.floor(Math.random()*praise.length)]), 100);
 
             showConfetti();
